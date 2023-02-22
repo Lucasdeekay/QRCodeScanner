@@ -1,0 +1,161 @@
+from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+from django.urls import reverse
+
+from django.views import View
+
+from Scanner.models import Person
+import pyqrcode
+# import png
+# from pyqrcode import QRCode
+# import numpy as np
+from pyzbar.pyzbar import decode
+import cv2
+
+
+class LoginView(View):
+    # Add template name
+    template_name = 'Scanner/login.html'
+
+    # Create get function
+    def get(self, request):
+        # Check if user is logged in
+        if request.user.is_authenticated:
+            # Redirect back to dashboard if true
+            return HttpResponseRedirect(reverse('Scanner:home'))
+        # Otherwise
+        else:
+            # Go to login page
+            return render(request, self.template_name)
+
+
+# Create function to scan code
+def scan_code(request):
+    # scanning QR code from camera feed
+    video = cv2.VideoCapture(0)
+    # Create output window
+    video.set(3, 640)
+    video.set(4, 740)
+
+    while True:
+        success, image = video.read()
+        for barcode in decode(image):
+            # get the text only
+            encoded_text = barcode.data.decode('utf-8')
+        cv2.imshow("Video", image)
+        cv2.waitKey(1)
+        # Process the input
+        username = encoded_text.split("-")[0]
+        password = encoded_text.split("-")[1]
+        # Authenticate the user login details
+        user = authenticate(request, username=username, password=password)
+        # Check if user exists
+        if user is not None:
+            # Log in the user
+            login(request, user)
+            # Redirect to dashboard page
+            return HttpResponseRedirect(reverse('Scanner:home'))
+        # If user does not exist
+        else:
+            # Create an error message
+            messages.error(request, "Invalid login details")
+            # Redirect back to the login page
+            return HttpResponseRedirect(reverse('Scanner:login'))
+
+
+# Create a view for the register page
+class RegisterView(View):
+    # Add template name
+    template_name = 'Scanner/register.html'
+
+    # Create get function
+    def get(self, request):
+        # Check if user is logged in
+        if request.user.is_authenticated:
+            # Redirect back to dashboard if true
+            return HttpResponseRedirect(reverse('Scanner:home'))
+        # Otherwise
+        else:
+            # Go to login page
+            return render(request, self.template_name)
+
+    # Create post function to process the form on submission
+    def post(self, request):
+        if request.method == 'POST':
+            full_name = request.POST.get('full_name').upper().strip()
+            email = request.POST.get('email').strip()
+            phone_no = request.POST.get('phone_no')
+            username = request.POST.get('username').strip()
+            password = request.POST.get('password').strip()
+            password2 = request.POST.get('password2').strip()
+
+            if password != password2:
+                messages.error(request, "Password does not match")
+                return HttpResponseRedirect(reverse('Scanner:register'))
+            else:
+                # # Create user and person object
+                # user = User.objects.create_user(username=username, password=password)
+                # Person.objects.create(user=user, full_name=full_name, email=email, phone_no=phone_no)
+
+
+                # Create the qr code
+                content = f"{username}-{password}"
+                qr_code = pyqrcode.create(content)
+                img = qr_code.png(f'media/qrcodes/{username}.png', scale=6)
+
+                messages.success(request, "Registration successful. Kindly login to your account.")
+                return render(request, 'Scanner/code.html', {'image': f'media/qrcodes/{username}.png'})
+
+
+# Create a view for the home page
+class HomeView(View):
+    # Add template name
+    template_name = 'Scanner/home.html'
+
+    # Create get function
+    def get(self, request):
+        # Check if user is logged in
+        if request.user.is_authenticated:
+            # Go to page
+            return render(request, self.template_name)
+        # Otherwise
+        else:
+            # Redirect back to login
+            return HttpResponseRedirect(reverse('Scanner:login'))
+
+
+# Create a view for the about page
+class AboutView(View):
+    # Add template name
+    template_name = 'Scanner/about.html'
+
+    # Create get function
+    def get(self, request):
+        # Check if user is logged in
+        if request.user.is_authenticated:
+            # Go to page
+            return render(request, self.template_name)
+        # Otherwise
+        else:
+            # Redirect back to login
+            return HttpResponseRedirect(reverse('Scanner:login'))
+
+
+# Create a view for the about page
+class ContactView(View):
+    # Add template name
+    template_name = 'Scanner/contact.html'
+
+    # Create get function
+    def get(self, request):
+        # Check if user is logged in
+        if request.user.is_authenticated:
+            # Go to page
+            return render(request, self.template_name)
+        # Otherwise
+        else:
+            # Redirect back to login
+            return HttpResponseRedirect(reverse('Scanner:login'))

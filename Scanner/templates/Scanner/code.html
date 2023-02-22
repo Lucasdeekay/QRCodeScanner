@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+Scan Code | Code Scanner
+{% endblock title %}
+
+
+{% block content %}
+<div id="wrapper" class="clearfix">
+
+    <header id="header">
+        <div class="header-wrap-clone"></div>
+    </header>
+
+    <section id="slider" class="slider-element min-vh-100 include-header"
+             style="background-image: url('{% static 'Scanner/images/3.jpg' %}');background-position: 50% 0;background-size:cover;">
+        <div class="slider-inner">
+            <div class="row justify-content-center align-items-center h-100">
+                 <div class="col-lg-5 col-sm-12 col-12">
+                    <div class="row form-section px-5 py-5 mx-3 bg-white rounded shadow-lg text-center">
+                        {% for message in messages %}
+                        <div class="bg-info text-white py-3 px-2 rounded align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="d-flex">
+                                <div class="toast-body">
+                                    {{ message }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        <div class="col-12 text-center">
+                            <img src="/{{ image }}" alt="qrcode" style="width:200px; margin:10px">
+                        </div>
+                        <div class="col-12">
+                            <h4><i>Snap or screenshot your your qr code</i></h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="content">
+        <div class="content-wrap p-0">
+        </div>
+    </section>
+</div>
+
+{% endblock content %}
+

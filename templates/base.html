@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+
+{% load static %}
+
+<html dir="ltr" lang="en-US">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="author" content="SemiColonWeb"/>
+
+    <link rel="stylesheet" href="{% static 'Scanner/css/bootstrap.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'Scanner/css/style.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'Scanner/css/dark.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'Scanner/css/font-icons.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'Scanner/css/animate.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'Scanner/css/magnific-popup.css' %}" type="text/css"/>
+    <link rel="stylesheet" href="{% static 'Scanner/css/custom.css' %}" type="text/css"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+
+    <title>{% block title %}{% endblock title %}</title>
+
+</head>
+<body class="stretched">
+
+    {% block content %}
+    {% endblock content %}
+
+    <script src="{% static 'Scanner/js/jquery.js' %}"></script>
+    <script src="{% static 'Scanner/js/plugins.min.js' %}"></script>
+    <script src="{% static 'Scanner/js/functions.js' %}"></script>
+
+</body>
+
+</html>
