@@ -30,22 +30,45 @@ Login | Code Scanner
                             </div>
                         </div>
                         {% endfor %}
+
                         <div class="col-12 form-group">
                             <div class="text-center">
-                                <i>Click the button below to scan your qr code and login</i>
+                                <button type="button" id="scan-btn" class="btn text-white bg-color rounded-3 fw-semibold text-uppercase mt-2">
+                                    <i>SCAN QR CODE</i>
+                                </button>
                             </div>
                         </div>
-                        <div class="col-12">
-                            <a href="{% url 'Scanner:scan_code' %}" name="landing-enquiry-submit"
-                               class="btn w-100 text-white bg-color rounded-3 py-3 fw-semibold text-uppercase mt-2">
-                                Scan QR Code
-                            </a>
+                        <div class="col-12 form-group" id="video">
+                            <video id="preview" width="100%"></video>
                         </div>
-                        <div class="text-center mt-3">
-                            <small>Already have an account?
-                                <a class="link" href="{% url 'Scanner:register' %}">Register</a>
-                            </small>
-                        </div>
+                        <form id="form" class="mb-0" method="post">
+                            {% csrf_token %}
+                            <div class="form-process"></div>
+                            <div class="row form-section px-4 py-5 bg-white rounded shadow-lg">
+                                <div class="col-12 form-group">
+                                      <label>Username</label>
+                                      <input type="text" name="username"
+                                             class="form-control form-control-lg required"
+                                             placeholder="demouser">
+                                  </div>
+                                <div class="col-12 form-group">
+                                      <label>Password</label>
+                                      <input type="password" name="password"
+                                             class="form-control form-control-lg required">
+                                  </div>
+                                <div class="col-12">
+                                    <button type="submit" name="landing-enquiry-submit" id="submit"
+                                            class="btn w-100 text-white bg-color rounded-3 py-3 fw-semibold text-uppercase mt-2">
+                                        Submit
+                                    </button>
+                                </div>
+                                <div class="text-center mt-3">
+                                    <small>Already have an account?
+                                        <a class="link" href="{% url 'Scanner:register' %}">Register</a>
+                                    </small>
+                                </div>
+                            </div>
+                        </form>
                     </div>
                     </form>
                 </div>
@@ -61,3 +84,38 @@ Login | Code Scanner
 
 {% endblock content %}
 
+{% block ajax %}
+
+$("#video").hide();
+
+$("#scan-btn").click(function(){
+    $("#video").show();
+    $("#form").hide();
+
+    let scanner = new Instascan.Scanner({
+      video: document.getElementById('preview'),
+      mirror: false
+    });
+
+    Instascan.Camera.getCameras().then(function(cameras) {
+      if (cameras.length > 0) {
+        scanner.start(cameras[0]);
+      } else {
+        alert('No cameras found.');
+        $("#video").hide();
+        $("#form").show();
+      }
+    }).catch(function(e) {
+        console.error(e);
+        $("#video").hide();
+        $("#form").show();
+    });
+
+    scanner.addListener('scan', function(content) {
+        console.log(content);
+        $("#submit").click();
+    });
+});
+
+
+{% endblock ajax %}

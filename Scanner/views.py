@@ -14,8 +14,6 @@ from django.views import View
 
 from Scanner.models import Person
 
-from pyzbar.pyzbar import decode
-import cv2
 from PIL import Image, ImageDraw
 
 
@@ -34,39 +32,26 @@ class LoginView(View):
             # Go to login page
             return render(request, self.template_name)
 
-
-# Create function to scan code
-def scan_code(request):
-    # scanning QR code from camera feed
-    video = cv2.VideoCapture(0)
-    # Create output window
-    video.set(3, 640)
-    video.set(4, 740)
-
-    while True:
-        success, image = video.read()
-        for barcode in decode(image):
-            # get the text only
-            encoded_text = barcode.data.decode('utf-8')
-        cv2.imshow("Video", image)
-        cv2.waitKey(1)
-        # Process the input
-        username = encoded_text.split("-")[0]
-        password = encoded_text.split("-")[1]
-        # Authenticate the user login details
-        user = authenticate(request, username=username, password=password)
-        # Check if user exists
-        if user is not None:
-            # Log in the user
-            login(request, user)
-            # Redirect to dashboard page
-            return HttpResponseRedirect(reverse('Scanner:home'))
-        # If user does not exist
-        else:
-            # Create an error message
-            messages.error(request, "Invalid login details")
-            # Redirect back to the login page
-            return HttpResponseRedirect(reverse('Scanner:login'))
+    # Create post function
+    def post(self, request):
+        if request.method == 'POST':
+            # Process the input
+            username = request.POST.get('username').strip()
+            password = request.POST.get('password').strip()
+            # Authenticate the user login details
+            user = authenticate(request, username=username, password=password)
+            # Check if user exists
+            if user is not None:
+                # Log in the user
+                login(request, user)
+                # Redirect to dashboard page
+                return HttpResponseRedirect(reverse('Scanner:home'))
+            # If user does not exist
+            else:
+                # Create an error message
+                messages.error(request, "Invalid login details")
+                # Redirect back to the login page
+                return HttpResponseRedirect(reverse('Scanner:login'))
 
 
 # Create a view for the register page
