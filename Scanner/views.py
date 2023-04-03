@@ -3,7 +3,7 @@ import os
 
 import qrcode
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.core.files import File
 from django.http import HttpResponseRedirect
@@ -122,35 +122,6 @@ class HomeView(View):
             return HttpResponseRedirect(reverse('Scanner:login'))
 
 
-# Create a view for the about page
-class AboutView(View):
-    # Add template name
-    template_name = 'Scanner/about.html'
-
-    # Create get function
-    def get(self, request):
-        # Check if user is logged in
-        if request.user.is_authenticated:
-            # Go to page
-            return render(request, self.template_name)
-        # Otherwise
-        else:
-            # Redirect back to login
-            return HttpResponseRedirect(reverse('Scanner:login'))
-
-
-# Create a view for the about page
-class ContactView(View):
-    # Add template name
-    template_name = 'Scanner/contact.html'
-
-    # Create get function
-    def get(self, request):
-        # Check if user is logged in
-        if request.user.is_authenticated:
-            # Go to page
-            return render(request, self.template_name)
-        # Otherwise
-        else:
-            # Redirect back to login
-            return HttpResponseRedirect(reverse('Scanner:login'))
+def log_out(request):
+    logout(request)
+    return HttpResponseRedirect(reverse('Scanner:login'))

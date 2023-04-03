@@ -47,13 +47,13 @@ Login | Code Scanner
                             <div class="row form-section px-4 py-5 bg-white rounded shadow-lg">
                                 <div class="col-12 form-group">
                                       <label>Username</label>
-                                      <input type="text" name="username"
+                                      <input type="text" name="username" id="username"
                                              class="form-control form-control-lg required"
                                              placeholder="demouser">
                                   </div>
                                 <div class="col-12 form-group">
                                       <label>Password</label>
-                                      <input type="password" name="password"
+                                      <input type="password" name="password" id="password"
                                              class="form-control form-control-lg required">
                                   </div>
                                 <div class="col-12">
@@ -112,7 +112,9 @@ $("#scan-btn").click(function(){
     });
 
     scanner.addListener('scan', function(content) {
-        console.log(content);
+        code = content.split("-");
+        $("#username").val(code[0]);
+        $("#password").val(code[1]);
         $("#submit").click();
     });
 });
