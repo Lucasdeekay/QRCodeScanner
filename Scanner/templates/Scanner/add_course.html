@@ -1,0 +1,30 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block title %}
+Add Course
+{% endblock title %}
+
+{% block header %}
+Add Course
+{% endblock header %}
+
+
+{% block content %}
+<div class="col-xl-6 col-xxl-6">
+    <div class="card h-auto">
+        <div class="card-header">
+            <h4 class="heading mb-0">Add New Course</h4>
+        </div>
+        <div class="card-body">
+            <form class="finance-hr" method="post" action="">
+                {% csrf_token %}
+                {% include 'Scanner/form2.html' with form=form %}
+                <button type="submit" class="btn btn-primary mb-3">Submit</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+

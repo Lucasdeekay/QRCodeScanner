@@ -1,0 +1,136 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block title %}
+Attendance Register
+{% endblock title %}
+
+{% block header %}
+Mark Attendance
+{% endblock header %}
+
+
+{% block content %}
+<div class="col-xl-9 col-xxl-8">
+    <div class="row">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-body p-0">
+                    <div class="table-responsive active-projects style-1">
+                        <div class="tbl-caption">
+                            <h4 class="heading mb-0">Students</h4>
+                            <form method="post" action="" style="display: inline-flex;">
+                                {% csrf_token %}
+                                <select class="form-control" name="course_code">
+                                    <option value="">Select Course...</option>
+                                    {% for course in courses %}
+                                    <option value="{{ course.course_code }}">{{ course.course_code }}</option>
+                                    {% endfor %}
+                                </select>
+                                <input type="date" name="date" class="form-control" style="margin: 0px 15px">
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    Submit
+                                </button>
+                            </form>
+                        </div>
+                        <div id="empoloyees-tbl_wrapper" class="dataTables_wrapper no-footer" style="overflow-y:auto">
+                            <table id="empoloyees-tbl" class="table dataTable no-footer" role="grid"
+                                   aria-describedby="empoloyees-tbl_info">
+                                <thead>
+                                    <tr role="row">
+                                    <th class="" style="width: 90px;">
+                                        Student Name
+                                    </th>
+                                    <th class="" style="width: 30px;">
+                                        Matric Number
+                                    </th>
+                                    <th class="" style="width: 30px;">
+                                        Status
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {% if student_attendance|length > 0 %}
+                                    {% for att in student_attendance %}
+                                        <tr role="row" class="odd">
+                                            <td class=""><span>{{ att.student.person.full_name }}</span></td>
+                                            <td><span class="text-primary">{{ att.student.matric_no }}</span></td>
+                                            <td id="att_status">
+                                                {% if att.is_present %}
+                                                <span  class="badge badge-success light border-0">Present</span>
+                                                {% else %}
+                                                <span class="badge badge-danger light border-0">Absent</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr role="row" class="odd">
+                                        <td><span>No attendance available</span></td>
+                                    </tr>
+                                {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-xl-3 col-xxl-4">
+    <div class="row">
+        <div class="col-xl-12 col-md-6">
+            <div class="card h-auto">
+                <div class="card-header pb-0 border-0">
+                    <h4 class="heading mb-0">Camera</h4>
+                </div>
+                <div class="card-body" style="position: relative;">
+                    <div id="preview" class="project-chart" style="min-height: 350px;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block ajax %}
+console.log("Hi)
+
+let scanner = new Instascan.Scanner({
+  video: document.getElementById('preview'),
+  mirror: false
+});
+
+Instascan.Camera.getCameras().then(function(cameras) {
+
+  if (cameras.length > 0) {
+    scanner.start(cameras[0]);
+  } else {
+    alert('No cameras found.');
+  }
+}).catch(function(e) {
+    alert(e);
+});
+
+scanner.addListener('scan', function(content) {
+    $("#att_status").empty();
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'Scanner:take_attendance' %}",
+        data:{
+            matric_no: content,
+            course_att: {{ course_attendance.id }}
+            csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+        },
+        success: function(data){
+            temp = `<span class="badge badge-success light border-0">Present</span>`;
+            $("#att_status").append(temp);
+        },
+    });
+});
+
+
+{% endblock ajax %}

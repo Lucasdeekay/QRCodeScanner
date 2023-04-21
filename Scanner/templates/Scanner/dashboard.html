@@ -1,0 +1,67 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block title %}
+Dashboard
+{% endblock title %}
+
+{% block header %}
+Dashboard
+{% endblock header %}
+
+
+{% block content %}
+<div class="col-xl-9 col-lg-9 col-sm-12">
+    <div class="card">
+        <div class="card-header border-0 pb-0 flex-wrap">
+            <h4 class="heading mb-0">My Profile</h4>
+        </div>
+        <div class="card-body">
+            <div class="card-use-box">
+                <div class="crd-bx-img">
+                    {% if person.is_staff %}
+                    <img src="{% static 'Scanner/images/profile.png' %}" alt="default image">
+                    {% else %}
+                    <img src="/media/{{ user.qr_image }}" alt="qr code">
+                    {% endif %}
+                </div>
+                <div class="card__text">
+                    <h4 class="mb-0">{{ person.full_name }}</h4>
+                    <p>{{ person.email }}</p>
+                </div>
+                <ul class="post-pos">
+                    {% if person.is_staff %}
+                    <li>
+                        <span class="card__info__stats">Position: </span>
+                        <span>Staff</span>
+                    </li>
+                    <li>
+                        <span class="card__info__stats">Staff ID: </span>
+                        <span>{{ user.staff_id }}</span>
+                    </li>
+                    <li>
+                        <span class="card__info__stats">Department: </span>
+                        <span>{{ user.department.department_name }}</span>
+                    </li>
+                    {% else %}
+                    <li>
+                        <span class="card__info__stats">Matric No: </span>
+                        <span>{{ user.matric_no }}</span>
+                    </li>
+                    <li>
+                        <span class="card__info__stats">Level: </span>
+                        <span>{{ user.level }}</span>
+                    </li>
+                    <li>
+                        <span class="card__info__stats">Programme: </span>
+                        <span>{{ user.programme.programme_name }}</span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+

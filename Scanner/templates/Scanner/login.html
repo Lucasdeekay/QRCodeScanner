@@ -1,123 +1,25 @@
-{% extends 'base.html' %}
+{% extends 'auth.html' %}
 
 {% load static %}
 
 {% block title %}
-Login | Code Scanner
+Login
 {% endblock title %}
 
 
 {% block content %}
-<div id="wrapper" class="clearfix">
-
-    <header id="header">
-        <div class="header-wrap-clone"></div>
-    </header>
-
-    <section id="slider" class="slider-element min-vh-100 include-header"
-             style="background-image: url('{% static 'Scanner/images/3.jpg' %}');background-position: 50% 0;background-size:cover;">
-        <div class="slider-inner">
-            <div class="row justify-content-center align-items-center h-100">
-                <div class="col-lg-5 col-sm-7 col-10">
-                    <div class="row form-section px-4 py-5 bg-white rounded shadow-lg">
-                        <div class="text-center"><h2>Login To Your Account</h2></div>
-                        {% for message in messages %}
-                        <div class="bg-info text-white align-items-center" role="alert" aria-live="assertive" aria-atomic="true">
-                            <div class="d-flex">
-                                <div class="toast-body">
-                                    {{ message }}
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
-
-                        <div class="col-12 form-group">
-                            <div class="text-center">
-                                <button type="button" id="scan-btn" class="btn text-white bg-color rounded-3 fw-semibold text-uppercase mt-2">
-                                    <i>SCAN QR CODE</i>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="col-12 form-group" id="video">
-                            <video id="preview" width="100%"></video>
-                        </div>
-                        <form id="form" class="mb-0" method="post">
-                            {% csrf_token %}
-                            <div class="form-process"></div>
-                            <div class="row form-section px-4 py-5 bg-white rounded shadow-lg">
-                                <div class="col-12 form-group">
-                                      <label>Username</label>
-                                      <input type="text" name="username" id="username"
-                                             class="form-control form-control-lg required"
-                                             placeholder="demouser">
-                                  </div>
-                                <div class="col-12 form-group">
-                                      <label>Password</label>
-                                      <input type="password" name="password" id="password"
-                                             class="form-control form-control-lg required">
-                                  </div>
-                                <div class="col-12">
-                                    <button type="submit" name="landing-enquiry-submit" id="submit"
-                                            class="btn w-100 text-white bg-color rounded-3 py-3 fw-semibold text-uppercase mt-2">
-                                        Submit
-                                    </button>
-                                </div>
-                                <div class="text-center mt-3">
-                                    <small>Already have an account?
-                                        <a class="link" href="{% url 'Scanner:register' %}">Register</a>
-                                    </small>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="content">
-        <div class="content-wrap p-0">
-        </div>
-    </section>
+<h4 class="text-center mb-4">Login your account</h4>
+<form action="" method="post">
+    {% csrf_token %}
+    {% include 'Scanner/form.html' with form=form %}
+    <div class="text-center mt-4">
+        <button type="submit" class="btn btn-primary btn-block">Log in</button>
+    </div>
+</form>
+<div class="new-account mt-3">
+    <p>Forgot password? <a class="text-primary" href="{% url 'Scanner:forgot_password' %}">Recover account</a></p>
+    <p>Don't have an account? <a class="text-primary" href="{% url 'Scanner:register' %}">Sign up</a></p>
 </div>
 
 {% endblock content %}
 
-{% block ajax %}
-
-$("#video").hide();
-
-$("#scan-btn").click(function(){
-    $("#video").show();
-    $("#form").hide();
-
-    let scanner = new Instascan.Scanner({
-      video: document.getElementById('preview'),
-      mirror: false
-    });
-
-    Instascan.Camera.getCameras().then(function(cameras) {
-      if (cameras.length > 0) {
-        scanner.start(cameras[0]);
-      } else {
-        alert('No cameras found.');
-        $("#video").hide();
-        $("#form").show();
-      }
-    }).catch(function(e) {
-        console.error(e);
-        $("#video").hide();
-        $("#form").show();
-    });
-
-    scanner.addListener('scan', function(content) {
-        code = content.split("-");
-        $("#username").val(code[0]);
-        $("#password").val(code[1]);
-        $("#submit").click();
-    });
-});
-
-
-{% endblock ajax %}

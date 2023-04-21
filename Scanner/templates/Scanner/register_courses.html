@@ -1,0 +1,117 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block title %}
+Register Courses
+{% endblock title %}
+
+{% block header %}
+Register Courses
+{% endblock header %}
+
+
+{% block content %}
+<div class="col-xl-12">
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive active-projects style-1">
+                <div class="tbl-caption">
+                    <h4 class="heading mb-0">Courses</h4>
+                    <form method="post" action="" style="display: inline-flex;">
+                        {% csrf_token %}
+                        <select class="form-control" name="semester" style="margin: 0px 30px">
+                            <option value="">Select Semester...</option>
+                            <option value="1st">1st</option>
+                            <option value="2nd">2nd</option>
+                        </select>
+                        <button type="submit" class="btn btn-success btn-sm">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+                <table id="empoloyees-tblwrapper" class="table">
+                    <thead>
+                    <tr role="row">
+                        <th class="" style="width: 90px;">
+                            Course Code
+                        </th>
+                        <th class="" style="width: 30px;">
+                            Course Title
+                        </th>
+                        <th class="" style="width: 30px;">
+                            Course Unit
+                        </th>
+                        <th class="" style="width: 30px;">
+                            Semester
+                        </th>
+                        <th class="" style="width: 30px;">
+                            Status
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if zipped|length > 0 %}
+                        {% for course, is_registered in zipped %}
+                        <tr role="row" class="odd">
+                            <td><span>{{ course.course_code }}</span></td>
+                            <td><span>{{ course.course_title }}</span></td>
+                            <td><span>{{ course.course_unit }}</span></td>
+                            <td><span>{{ course.semester }}</span></td>
+                            <td id="reg_status">
+                                {% if is_registered %}
+                                <span onclick="remove_course({{ course.course_code }})" class="badge badge-danger border-0">Remove</span>
+                                {% else %}
+                                <span onclick="add_course({{ course.course_code }})" class="badge badge-success border-0">Add</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr role="row" class="odd">
+                            <td><span>No course available</span></td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+
+function add_course(code) {
+    $("#reg_status").empty();
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'Scanner:add_course' %}",
+        data:{
+            course_code: code,
+            csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+        },
+        success: function(data){
+            temp = `<span onclick="remove_course(${ data.course_code })" class="badge badge-danger border-0">Remove</span>`;
+            $("#reg_status").append(temp);
+        },
+    });
+};
+
+function remove_course(code) {
+    $("#reg_status").empty();
+    $.ajax({
+        type: 'POST',
+        url: "{% url 'Scanner:remove_course' %}",
+        data:{
+            course_code: code,
+            csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+        },
+        success: function(data){
+            temp = `<span onclick="add_course(${ data.course_code })" class="badge badge-success border-0">Add</span>`;
+            $("#reg_status").append(temp);
+        },
+    });
+};
+
+{% endblock javascript %}

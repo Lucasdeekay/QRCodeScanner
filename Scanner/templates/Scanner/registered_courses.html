@@ -1,0 +1,71 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block title %}
+Registered Courses
+{% endblock title %}
+
+{% block header %}
+Registered Courses
+{% endblock header %}
+
+
+{% block content %}
+<div class="col-xl-12">
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive active-projects style-1">
+                <div class="tbl-caption">
+                    <h4 class="heading mb-0">Courses</h4>
+                    <form method="post" action="" style="display: inline-flex;">
+                        {% csrf_token %}
+                        <select class="form-control" name="semsester" style="margin: 0px 30px">
+                            <option value="">Select Semester...</option>
+                            <option value="1st">1st</option>
+                            <option value="2nd">2nd</option>
+                        </select>
+                        <button type="submit" class="btn btn-success btn-sm">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+                <table id="empoloyees-tblwrapper" class="table">
+                    <thead>
+                    <tr role="row">
+                        <th class="" style="width: 90px;">
+                            Course Code
+                        </th>
+                        <th class="" style="width: 30px;">
+                            Course Title
+                        </th>
+                        <th class="" style="width: 30px;">
+                            Course Unit
+                        </th>
+                        <th class="" style="width: 30px;">
+                            Semester
+                        </th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% if courses|length > 0 %}
+                        {% for course in courses %}
+                        <tr role="row" class="odd">
+                            <td><span>{{ course.course_code }}</span></td>
+                            <td><span>{{ course.course_title }}</span></td>
+                            <td><span>{{ course.course_unit }}</span></td>
+                            <td><span>{{ course.semester }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr role="row" class="odd">
+                            <td><span>No course registered</span></td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

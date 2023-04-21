@@ -1,0 +1,75 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block title %}
+Attendance Sheet
+{% endblock title %}
+
+{% block header %}
+View Attendance
+{% endblock header %}
+
+
+{% block content %}
+<div class="col-xl-12">
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive active-projects style-1">
+                <div class="tbl-caption">
+                    <h4 class="heading mb-0">Students</h4>
+                    <form method="post" action="" style="display: inline-flex;">
+                        {% csrf_token %}
+                        <select class="form-control" name="course_code">
+                            <option value="">Select Course...</option>
+                            {% for course in courses %}
+                            <option value="{{ course.course_code }}">{{ course.course_code }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="date" name="date" class="form-control" style="margin: 0px 15px">
+                        <button type="submit" class="btn btn-success btn-sm">
+                            Submit
+                        </button>
+                    </form>
+                </div>
+                <table id="empoloyees-tblwrapper" class="table">
+                    <thead>
+                        <tr role="row">
+                            <th class="" style="width: 90px;">
+                                Student Name
+                            </th>
+                            <th class="" style="width: 30px;">
+                                Matric Number
+                            </th>
+                            <th class="" style="width: 30px;">
+                                Status
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% if student_attendance|length > 0 %}
+                        {% for att in student_attendance %}
+                            <tr role="row" class="odd">
+                                <td class=""><span>{{ att.student.person.full_name }}</span></td>
+                                <td><span class="text-primary">{{ att.student.matric_no }}</span></td>
+                                <td>
+                                    {% if att.is_present %}
+                                    <span class="badge badge-success light border-0">Present</span>
+                                    {% else %}
+                                    <span class="badge badge-danger light border-0">Absent</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr role="row" class="odd">
+                            <td><span>No attendance available</span></td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
