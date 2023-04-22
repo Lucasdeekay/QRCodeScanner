@@ -90,73 +90,12 @@ class RegisterForm(forms.Form):
             }
         )
     )
-    department = forms.CharField(
-        help_text="Select programme if staff",
-        max_length=30,
-        widget=forms.Select(
-            choices=[
-                (' Science', 'Select Department'),
-                ('Computer Science', 'Computer Science'),
-                ('Biological Science', 'Biological Science'),
-                ('Chemical Science', 'Chemical Science'),
-                ('Business Administration', 'Business Administration'),
-                ('Mass Communication', 'Mass Communication'),
-                ('Criminology', 'Criminology'),
-                ('Accounting', 'Accounting'),
-            ],
-            attrs={
-                'class': 'form-control',
-            }
-        )
-    )
-    programme = forms.CharField(
-        max_length=30,
-        help_text="Select programme if student",
-        widget=forms.Select(
-            choices=[
-                ('', 'Select Programme'),
-                ('Computer Science', 'Computer Science'),
-                ('Software Engineering', 'Software Engineering'),
-                ('Cyber Security', 'Cyber Security'),
-                ('Biochemistry', 'Biochemistry'),
-                ('Industrial Chemistry', 'Industrial Chemistry'),
-                ('Business Administration', 'Business Administration'),
-                ('Mass Communication', 'Mass Communication'),
-                ('Criminology', 'Criminology'),
-                ('Microbiology', 'Microbiology'),
-                ('Economics', 'Economics'),
-                ('Accounting', 'Accounting'),
-            ],
-            attrs={
-                'class': 'form-control',
-            }
-        )
-    )
-    level = forms.CharField(
-        max_length=30,
-        help_text="Select level if student",
-        widget=forms.Select(
-            choices=[
-                ('', 'Select Level'),
-                ('100', '100'),
-                ('200', '200'),
-                ('300', '300'),
-                ('400', '400'),
-            ],
-            attrs={
-                'class': 'form-control',
-            }
-        )
-    )
 
     def clean(self):
         cleaned_data = super(RegisterForm, self).clean()
         full_name = cleaned_data.get('full_name')
         email = cleaned_data.get('email')
         user_id = cleaned_data.get('user_id')
-        level = cleaned_data.get('level')
-        programme = cleaned_data.get('programme')
-        department = cleaned_data.get('last_name')
         if not full_name or not email or not user_id:
             raise forms.ValidationError("Field cannot be empty")
 

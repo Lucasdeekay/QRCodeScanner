@@ -14,7 +14,36 @@ Register
     {% csrf_token %}
     {% include 'Scanner/form.html' with form=form %}
     <div class="mb-3">
-    <input type="checkbox" name="user_type" required="" id="id_user_type">
+        <label class="mb-1"><strong><label for="id_programme">Programme:</label></strong></label>
+        <select name="programme" class="form-control" maxlength="30" id="id_programme">
+            <option value="" selected="">Select Programme</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Software Engineering">Software Engineering</option>
+            <option value="Cyber Security">Cyber Security</option>
+            <option value="Biochemistry">Biochemistry</option>
+            <option value="Industrial Chemistry">Industrial Chemistry</option>
+            <option value="Business Administration">Business Administration</option>
+            <option value="Mass Communication">Mass Communication</option>
+            <option value="Criminology">Criminology</option>
+            <option value="Microbiology">Microbiology</option>
+            <option value="Economics">Economics</option>
+            <option value="Accounting">Accounting</option>
+        </select>
+        <div class="help-block form-text with-errors form-control-feedback">Select programme if student</div>
+    </div>
+    <div class="mb-3">
+        <label class="mb-1"><strong><label for="id_level">Level:</label></strong></label>
+        <select name="level" class="form-control" maxlength="30" id="id_level">
+            <option value="" selected="">Select Level</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
+            <option value="300">300</option>
+            <option value="400">400</option>
+        </select>
+        <div class="help-block form-text with-errors form-control-feedback">Select level if student</div>
+    </div>
+    <div class="mb-3">
+        <input type="checkbox" name="user_type" id="id_user_type">
         <label><strong><label for="id_user_type">Student</label></strong></label>
     </div>
     <div class="text-center mt-4">

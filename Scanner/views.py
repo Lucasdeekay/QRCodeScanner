@@ -10,15 +10,11 @@ from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views import View
 
 from .forms import LoginForm, UpdatePasswordForm, RegisterForm, ForgotPasswordForm, CourseForm
-from .models import Staff, Course, RegisteredStudent, CourseAttendance, Student, \
-    StudentAttendance, Person, RegisteredCourses, Department, Programme
-
-from QRScanner.settings import EMAIL_HOST_USER
+from .models import Staff, Course, CourseAttendance, Student, Person, RegisteredCourses, Department, Programme
 
 
 # Create a login view
@@ -171,9 +167,9 @@ class RegisterView(View):
             full_name = form.cleaned_data['full_name'].strip().upper()
             email = form.cleaned_data['email'].strip()
             user_id = form.cleaned_data['user_id'].strip().upper()
-            level = form.cleaned_data['level'].strip()
-            prog = form.cleaned_data['programme'].strip()
-            dep = form.cleaned_data['department'].strip()
+            level = request.POST.get('level').strip()
+            prog = request.POST.get('programme').strip()
+            dep = request.POST.get('department').strip()
             is_staff = request.POST.get("user_type").strip()
 
             user = User.objects.create_user(username=user_id, password="password")
