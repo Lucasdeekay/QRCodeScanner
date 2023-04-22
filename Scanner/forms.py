@@ -128,7 +128,6 @@ class RegisterForm(forms.Form):
                 ('Accounting', 'Accounting'),
             ],
             attrs={
-                'placeholder': 'Enter your programme',
                 'class': 'form-control',
             }
         )
