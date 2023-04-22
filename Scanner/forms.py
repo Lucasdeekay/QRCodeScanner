@@ -95,6 +95,7 @@ class RegisterForm(forms.Form):
         max_length=30,
         widget=forms.Select(
             choices=[
+                (' Science', 'Select Department'),
                 ('Computer Science', 'Computer Science'),
                 ('Biological Science', 'Biological Science'),
                 ('Chemical Science', 'Chemical Science'),
@@ -104,7 +105,6 @@ class RegisterForm(forms.Form):
                 ('Accounting', 'Accounting'),
             ],
             attrs={
-                'placeholder': 'Enter your department',
                 'class': 'form-control',
             }
         )
@@ -145,7 +145,6 @@ class RegisterForm(forms.Form):
                 ('400', '400'),
             ],
             attrs={
-                'placeholder': 'Enter your level',
                 'class': 'form-control',
             }
         )
