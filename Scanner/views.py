@@ -170,17 +170,11 @@ class RegisterView(View):
             level = request.POST.get('level').strip()
             prog = request.POST.get('programme').strip()
             dep = request.POST.get('department').strip()
-            is_staff = request.POST.get("user_type").strip()
+            is_staff = request.POST.get("user_type")
 
             user = User.objects.create_user(username=user_id, password="password")
 
-            if is_staff:
-                department = get_object_or_404(Department, department_name=dep)
-                person = Person.objects.create(user=user, full_name=full_name, email=email, is_staff=True)
-                Staff.objects.create(person=person, staff_id=user_id, department=department)
-
-                messages.success(request, "Staff successfully registered")
-            else:
+            if is_staff == "on":
                 programme = get_object_or_404(Programme, programme_name=prog)
                 person = Person.objects.create(user=user, full_name=full_name, email=email, is_staff=False)
                 student = Student.objects.create(person=person, matric_no=user_id, level=level, programme=programme)
@@ -199,6 +193,12 @@ class RegisterView(View):
                 student.save()
 
                 messages.success(request, "Student successfully registered")
+            else:
+                department = get_object_or_404(Department, department_name=dep)
+                person = Person.objects.create(user=user, full_name=full_name, email=email, is_staff=True)
+                Staff.objects.create(person=person, staff_id=user_id, department=department)
+
+                messages.success(request, "Staff successfully registered")
 
         # Redirect back to dashboard if true
         return HttpResponseRedirect(reverse('Scanner:register'))
