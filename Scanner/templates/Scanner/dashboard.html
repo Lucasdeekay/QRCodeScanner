@@ -19,11 +19,11 @@ Dashboard
         </div>
         <div class="card-body">
             <div class="card-use-box">
-                <div class="crd-bx-img">
+                <div>
                     {% if person.is_staff %}
-                    <img src="{% static 'Scanner/images/profile.png' %}" alt="default image">
+                    <img src="{% static 'Scanner/images/profile.png' %}" width="200px" alt="default image">
                     {% else %}
-                    <img src="/media/{{ user.qr_image }}" alt="qr code">
+                    <img src="/media/{{ user.qr_image }}" width="200px" alt="qr code">
                     {% endif %}
                 </div>
                 <div class="card__text">

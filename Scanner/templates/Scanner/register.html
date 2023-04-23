@@ -16,21 +16,21 @@ Register
     <div class="mb-3">
         <label class="mb-1"><strong><label for="id_department">Department:</label></strong></label>
         <select name="department" class="form-control" maxlength="30" id="id_department">
-            <option value="" selected="">Select Department</option>
-            <option value="Computer Science">Computer Sciences</option>
-            <option value="Biological Sciences">Biological Sciences</option>
-            <option value="Chemical Sciences">Chemical Sciences</option>
+            <option value="">Select Department</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Biological Science">Biological Science</option>
+            <option value="Chemical Science">Chemical Science</option>
             <option value="Business Administration">Business Administration</option>
             <option value="Mass Communication">Mass Communication</option>
             <option value="Criminology">Criminology</option>
             <option value="Accounting">Accounting</option>
         </select>
-        <div class="help-block form-text with-errors form-control-feedback">Select programme if student</div>
+        <div class="help-block form-text with-errors form-control-feedback">Select programme if staff</div>
     </div>
     <div class="mb-3">
         <label class="mb-1"><strong><label for="id_programme">Programme:</label></strong></label>
         <select name="programme" class="form-control" maxlength="30" id="id_programme">
-            <option value="" selected="">Select Programme</option>
+            <option value="">Select Programme</option>
             <option value="Computer Science">Computer Science</option>
             <option value="Software Engineering">Software Engineering</option>
             <option value="Cyber Security">Cyber Security</option>
@@ -48,7 +48,7 @@ Register
     <div class="mb-3">
         <label class="mb-1"><strong><label for="id_level">Level:</label></strong></label>
         <select name="level" class="form-control" maxlength="30" id="id_level">
-            <option value="" selected="">Select Level</option>
+            <option value="">Select Level</option>
             <option value="100">100</option>
             <option value="200">200</option>
             <option value="300">300</option>
@@ -59,6 +59,14 @@ Register
     <div class="mb-3">
         <input type="checkbox" name="user_type" id="id_user_type">
         <label><strong><label for="id_user_type">Student</label></strong></label>
+    </div>
+    <div class="mb-3">
+        <label class="mb-1"><strong><label for="id_password">Password:</label></strong></label>
+        <input type="password" class="form-control" name="password" required id="id_password" placeholder="Enter Password">
+    </div>
+    <div class="mb-3">
+        <label class="mb-1"><strong><label for="id_confirm_password">Confirm Password:</label></strong></label>
+        <input type="password" class="form-control" name="confirm_password" required id="id_confirm_password" placeholder="Confirm Password">
     </div>
     <div class="text-center mt-4">
         <button type="submit" class="btn btn-primary btn-block">Sign me up</button>

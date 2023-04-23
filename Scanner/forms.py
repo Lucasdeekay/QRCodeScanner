@@ -177,6 +177,7 @@ class CourseForm(forms.Form):
         max_length=30,
         widget=forms.Select(
             choices=[
+                ('', 'Select Department'),
                 ('Computer Science', 'Computer Science'),
                 ('Biological Science', 'Biological Science'),
                 ('Chemical Science', 'Chemical Science'),

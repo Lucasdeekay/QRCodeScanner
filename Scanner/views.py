@@ -170,38 +170,48 @@ class RegisterView(View):
             level = request.POST.get('level').strip()
             prog = request.POST.get('programme').strip()
             dep = request.POST.get('department').strip()
-            is_staff = request.POST.get("user_type")
+            password = request.POST.get('password').strip()
+            confirm_password = request.POST.get('confirm_password').strip()
+            is_student = request.POST.get("user_type")
 
-            user = User.objects.create_user(username=user_id, password="password")
+            if password == confirm_password:
+                user = User.objects.create_user(username=user_id, password=password)
+                user.save()
 
-            if is_staff == "on":
-                programme = get_object_or_404(Programme, programme_name=prog)
-                person = Person.objects.create(user=user, full_name=full_name, email=email, is_staff=False)
-                student = Student.objects.create(person=person, matric_no=user_id, level=level, programme=programme)
+                if is_student == "on":
+                    programme = get_object_or_404(Programme, programme_name=prog)
+                    person = Person.objects.create(user=user, full_name=full_name, email=email, is_staff=False)
+                    student = Student.objects.create(person=person, matric_no=user_id, level=level, programme=programme)
 
-                # Create the qr code
-                qrcode_img = qrcode.make(f"{user_id}")
-                canvas = Image.new("RGB", (300, 300), "white")
-                ImageDraw.Draw(canvas)
-                canvas.paste(qrcode_img)
-                buffer = io.BytesIO()
-                canvas.save(buffer, "PNG")
+                    # Create the qr code
+                    qrcode_img = qrcode.make(f"{user_id}")
+                    canvas = Image.new("RGB", (300, 300), "white")
+                    ImageDraw.Draw(canvas)
+                    canvas.paste(qrcode_img)
+                    buffer = io.BytesIO()
+                    canvas.save(buffer, "PNG")
 
-                student.qr_image.save(f"{user_id}", File(buffer), save=False)
-                canvas.close()
+                    student.qr_image.save(f"{user_id}", File(buffer), save=False)
+                    canvas.close()
 
-                student.save()
+                    student.save()
 
-                messages.success(request, "Student successfully registered")
+                    messages.success(request, "Student successfully registered")
+                else:
+                    department = get_object_or_404(Department, department_name=dep)
+                    person = Person.objects.create(user=user, full_name=full_name, email=email, is_staff=True)
+                    Staff.objects.create(person=person, staff_id=user_id, department=department)
+
+                    messages.success(request, "Staff successfully registered")
+
+                # Redirect back to dashboard if true
+                return HttpResponseRedirect(reverse('Scanner:login'))
+
             else:
-                department = get_object_or_404(Department, department_name=dep)
-                person = Person.objects.create(user=user, full_name=full_name, email=email, is_staff=True)
-                Staff.objects.create(person=person, staff_id=user_id, department=department)
+                messages.success(request, "Password does not match")
 
-                messages.success(request, "Staff successfully registered")
-
-        # Redirect back to dashboard if true
-        return HttpResponseRedirect(reverse('Scanner:register'))
+                # Redirect back to dashboard if true
+                return HttpResponseRedirect(reverse('Scanner:register'))
 
 
 # Create a dashboard view
@@ -282,11 +292,12 @@ class CreateCourseView(View):
             if Course.objects.filter(course_code=course_code).exists():
                 messages.error(request, "Course already exists")
             else:
+                department = get_object_or_404(Department, department_name=department)
                 Course.objects.create(course_title=course_title, course_code=course_code, course_unit=course_unit,
                                       semester=semester, department=department, lecturer=staff)
                 messages.success(request, "Course successfully created")
 
-            return HttpResponseRedirect(reverse("Scanner:add_course"))
+            return HttpResponseRedirect(reverse("Scanner:create_course"))
 
 
 # Create a register courses view
