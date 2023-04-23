@@ -199,6 +199,6 @@ class CourseForm(forms.Form):
         course_code = cleaned_data.get('course_code')
         course_unit = cleaned_data.get('course_unit')
         semester = cleaned_data.get('semester')
-        department = cleaned_data.get('last_name')
+        department = cleaned_data.get('department')
         if not course_title or not course_code or not course_unit or not semester or not department:
             raise forms.ValidationError("Field cannot be empty")

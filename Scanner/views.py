@@ -175,37 +175,42 @@ class RegisterView(View):
             is_student = request.POST.get("user_type")
 
             if password == confirm_password:
-                user = User.objects.create_user(username=user_id, password=password)
-                user.save()
+                try:
+                    user = User.objects.create_user(username=user_id, password=password)
+                    user.save()
 
-                if is_student == "on":
-                    programme = get_object_or_404(Programme, programme_name=prog)
-                    person = Person.objects.create(user=user, full_name=full_name, email=email, is_staff=False)
-                    student = Student.objects.create(person=person, matric_no=user_id, level=level, programme=programme)
+                    if is_student == "on":
+                        programme = get_object_or_404(Programme, programme_name=prog)
+                        person = Person.objects.create(user=user, full_name=full_name, email=email, is_staff=False)
+                        student = Student.objects.create(person=person, matric_no=user_id, level=level, programme=programme)
 
-                    # Create the qr code
-                    qrcode_img = qrcode.make(f"{user_id}")
-                    canvas = Image.new("RGB", (300, 300), "white")
-                    ImageDraw.Draw(canvas)
-                    canvas.paste(qrcode_img)
-                    buffer = io.BytesIO()
-                    canvas.save(buffer, "PNG")
+                        # Create the qr code
+                        qrcode_img = qrcode.make(f"{user_id}")
+                        canvas = Image.new("RGB", (300, 300), "white")
+                        ImageDraw.Draw(canvas)
+                        canvas.paste(qrcode_img)
+                        buffer = io.BytesIO()
+                        canvas.save(buffer, "PNG")
 
-                    student.qr_image.save(f"{user_id}", File(buffer), save=False)
-                    canvas.close()
+                        student.qr_image.save(f"{user_id}", File(buffer), save=False)
+                        canvas.close()
 
-                    student.save()
+                        student.save()
 
-                    messages.success(request, "Student successfully registered")
-                else:
-                    department = get_object_or_404(Department, department_name=dep)
-                    person = Person.objects.create(user=user, full_name=full_name, email=email, is_staff=True)
-                    Staff.objects.create(person=person, staff_id=user_id, department=department)
+                        messages.success(request, "Student successfully registered")
+                    else:
+                        department = get_object_or_404(Department, department_name=dep)
+                        person = Person.objects.create(user=user, full_name=full_name, email=email, is_staff=True)
+                        Staff.objects.create(person=person, staff_id=user_id, department=department)
 
-                    messages.success(request, "Staff successfully registered")
+                        messages.success(request, "Staff successfully registered")
 
-                # Redirect back to dashboard if true
-                return HttpResponseRedirect(reverse('Scanner:login'))
+                    # Redirect back to dashboard if true
+                    return HttpResponseRedirect(reverse('Scanner:login'))
+                except Exception:
+                    messages.success(request, "User already exists")
+                    # Redirect back to dashboard if true
+                    return HttpResponseRedirect(reverse('Scanner:register'))
 
             else:
                 messages.success(request, "Password does not match")
@@ -285,9 +290,9 @@ class CreateCourseView(View):
             # Process the input
             course_title = form.cleaned_data['course_title'].strip().upper()
             course_code = form.cleaned_data['course_code'].strip().upper()
-            course_unit = form.cleaned_data['course_unit'].strip()
-            semester = form.cleaned_data['semester'].strip().upper()
-            department = form.cleaned_data['department'].strip().upper()
+            course_unit = form.cleaned_data['course_unit']
+            semester = form.cleaned_data['semester'].strip()
+            department = form.cleaned_data['department'].strip()
 
             if Course.objects.filter(course_code=course_code).exists():
                 messages.error(request, "Course already exists")
@@ -315,7 +320,7 @@ class RegisterCoursesView(View):
         context = {
             'person': person,
         }
-        # # Load te page with the data
+        # Load te page with the data
         return render(request, self.template_name, context)
 
     # Add a method decorator to make sure user is logged in
@@ -332,11 +337,16 @@ class RegisterCoursesView(View):
             # Get the current logged in student
             student = get_object_or_404(Student, person=person)
             # Get every courses in the students department
-            courses = Course.objects.filter(semester=semester)
-            # Get all the courses registered for by a student
-            reg_courses = RegisteredCourses.objects.filter(student=student)
-            is_registered = []
+            courses = Course.objects.filter(semester=semester, department=student.programme.department)
 
+            if RegisteredCourses.objects.filter(student=student).exists():
+                # Get all the courses registered for by a student
+                reg_courses = RegisteredCourses.objects.get(student=student)
+            else:
+                # Create object
+                reg_courses = RegisteredCourses.objects.create(student=student)
+
+            is_registered = []
             for course in courses:
                 if course in reg_courses.courses.all():
                     is_registered.append(True)
@@ -347,12 +357,13 @@ class RegisterCoursesView(View):
 
             # Create a dictionary of data to be returned to the page
             context = {
+                'person': person,
                 'student': student,
                 'zipped': zipped,
             }
 
             # return data back to the page
-            return HttpResponseRedirect(reverse("Scanner:register_courses", args=(context,)))
+            return render(request, self.template_name, context)
 
 
 # Create function to add course to registered courses
@@ -436,12 +447,13 @@ class RegisteredCoursesView(View):
 
             # Create a dictionary of data to be returned to the page
             context = {
+                'person': person,
                 'student': student,
                 'courses': courses,
             }
 
             # return data back to the page
-            return HttpResponseRedirect(reverse("Scanner:registered_courses", args=(context,)))
+            return render(request, self.template_name, context)
 
 
 # Create a attendance register view
@@ -455,9 +467,14 @@ class AttendanceRegisterView(View):
     def get(self, request):
         # Get the current person logged in
         person = get_object_or_404(Person, user=request.user)
+        # Get the current logged in staff
+        current_staff = get_object_or_404(Staff, person=person)
+        #  Filter all the courses taken by the staff
+        courses = Course.objects.filter(lecturer=current_staff)
         # Create a dictionary of data to be accessed on the page
         context = {
             'person': person,
+            'courses': courses,
         }
         return render(request, self.template_name, context)
 
@@ -498,11 +515,12 @@ class AttendanceRegisterView(View):
             # if course attendance does not exist
             except Exception:
                 context = {
+                    'person': person,
                     'student_attendance': {},
                     'courses': courses,
                 }
             # return data back to the page
-            return HttpResponseRedirect(reverse("Scanner:attendance_sheet", args=(context,)))
+            return render(request, self.template_name, context)
 
 
 # Create function to mark attendance
@@ -536,9 +554,14 @@ class AttendanceSheetView(View):
     def get(self, request):
         # Get the current person logged in
         person = get_object_or_404(Person, user=request.user)
+        # Get the current logged in staff
+        current_staff = get_object_or_404(Staff, person=person)
+        #  Filter all the courses taken by the staff
+        courses = Course.objects.filter(lecturer=current_staff)
         # Create a dictionary of data to be accessed on the page
         context = {
             'person': person,
+            'courses': courses,
         }
         return render(request, self.template_name, context)
 
@@ -572,17 +595,19 @@ class AttendanceSheetView(View):
                 student_attendance = course_attendance.student_attendance.all().order_by('id')
                 # Create a dictionary of data to be returned to the page
                 context = {
+                    'person': person,
                     'student_attendance': student_attendance,
                     'courses': courses,
                 }
             # if course attendance does not exist
             except Exception:
                 context = {
+                    'person': person,
                     'student_attendance': {},
                     'courses': courses,
                 }
             # return data back to the page
-            return HttpResponseRedirect(reverse("Scanner:attendance_sheet", args=(context,)))
+            return render(request, self.template_name, context)
 
 
 # Create a logout view
