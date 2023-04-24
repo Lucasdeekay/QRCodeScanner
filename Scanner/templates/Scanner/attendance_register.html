@@ -51,7 +51,7 @@ Mark Attendance
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% if student_attendance|length > 0 %}
+                                {% if student_attendance %}
                                     {% for att in student_attendance %}
                                         <tr role="row" class="odd">
                                             <td class=""><span>{{ att.student.person.full_name }}</span></td>
@@ -87,7 +87,8 @@ Mark Attendance
                     <h4 class="heading mb-0">Camera</h4>
                 </div>
                 <div class="card-body" style="position: relative;">
-                    <div id="preview" class="project-chart" style="min-height: 350px;">
+                    <div id="video" class="project-chart" style="min-height: 350px;">
+                        <video id="preview" width="100%"></video>
                     </div>
                 </div>
             </div>
@@ -97,7 +98,8 @@ Mark Attendance
 {% endblock content %}
 
 {% block ajax %}
-console.log("Hi)
+
+$("#video").hide();
 
 let scanner = new Instascan.Scanner({
   video: document.getElementById('preview'),
@@ -116,14 +118,15 @@ Instascan.Camera.getCameras().then(function(cameras) {
 });
 
 scanner.addListener('scan', function(content) {
+    $("#video").show();
     $("#att_status").empty();
     $.ajax({
         type: 'POST',
         url: "{% url 'Scanner:take_attendance' %}",
         data:{
             matric_no: content,
-            course_att: {{ course_attendance.id }}
-            csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
+            course_att: {{ course_attendance.id }},
+            csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
         },
         success: function(data){
             temp = `<span class="badge badge-success light border-0">Present</span>`;

@@ -47,7 +47,7 @@ View Attendance
                         </tr>
                     </thead>
                     <tbody>
-                    {% if student_attendance|length > 0 %}
+                    {% if student_attendance %}
                         {% for att in student_attendance %}
                             <tr role="row" class="odd">
                                 <td class=""><span>{{ att.student.person.full_name }}</span></td>

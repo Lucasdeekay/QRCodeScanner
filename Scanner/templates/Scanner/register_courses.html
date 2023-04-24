@@ -51,7 +51,7 @@ Register Courses
                     </tr>
                     </thead>
                     <tbody>
-                    {% if zipped|length > 0 %}
+                    {% if zipped %}
                         {% for course, is_registered in zipped %}
                         <tr role="row" class="odd">
                             <td><span>{{ course.course_code }}</span></td>
@@ -60,9 +60,9 @@ Register Courses
                             <td><span>{{ course.semester }}</span></td>
                             <td id="reg_status">
                                 {% if is_registered %}
-                                <span onclick="remove_course({{ course.course_code }})" class="badge badge-danger border-0">Remove</span>
+                                <span onclick="remove_course('{{ course.course_code }}')" class="btn btn-danger border-0">Remove</span>
                                 {% else %}
-                                <span onclick="add_course({{ course.course_code }})" class="badge badge-success border-0">Add</span>
+                                <span onclick="add_course('{{ course.course_code }}')" class="btn btn-success border-0">Add</span>
                                 {% endif %}
                             </td>
                         </tr>
@@ -92,7 +92,7 @@ function add_course(code) {
             csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
         },
         success: function(data){
-            temp = `<span onclick="remove_course(${ data.course_code })" class="badge badge-danger border-0">Remove</span>`;
+            temp = `<span onclick="remove_course(${ data.course_code })" class="btn btn-danger border-0">Remove</span>`;
             $("#reg_status").append(temp);
         },
     });
@@ -108,7 +108,7 @@ function remove_course(code) {
             csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val(),
         },
         success: function(data){
-            temp = `<span onclick="add_course(${ data.course_code })" class="badge badge-success border-0">Add</span>`;
+            temp = `<span onclick="add_course(${ data.course_code })" class="btn btn-success border-0">Add</span>`;
             $("#reg_status").append(temp);
         },
     });

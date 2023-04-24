@@ -14,7 +14,8 @@ from django.utils.decorators import method_decorator
 from django.views import View
 
 from .forms import LoginForm, UpdatePasswordForm, RegisterForm, ForgotPasswordForm, CourseForm
-from .models import Staff, Course, CourseAttendance, Student, Person, RegisteredCourses, Department, Programme
+from .models import Staff, Course, CourseAttendance, Student, Person, RegisteredCourses, Department, Programme, \
+    RegisteredStudent, StudentAttendance
 
 
 # Create a login view
@@ -298,8 +299,9 @@ class CreateCourseView(View):
                 messages.error(request, "Course already exists")
             else:
                 department = get_object_or_404(Department, department_name=department)
-                Course.objects.create(course_title=course_title, course_code=course_code, course_unit=course_unit,
+                course = Course.objects.create(course_title=course_title, course_code=course_code, course_unit=course_unit,
                                       semester=semester, department=department, lecturer=staff)
+                RegisteredStudent.objects.create(course=course)
                 messages.success(request, "Course successfully created")
 
             return HttpResponseRedirect(reverse("Scanner:create_course"))
@@ -367,7 +369,6 @@ class RegisterCoursesView(View):
 
 
 # Create function to add course to registered courses
-@method_decorator(login_required())
 def add_course(request):
     if request.method == "POST":
         course_code = request.POST.get("course_code")
@@ -382,14 +383,20 @@ def add_course(request):
         else:
             reg_courses = RegisteredCourses(student=student)
 
+        # Get all the student registered for by a course
+        reg_std = RegisteredStudent.objects.get(course=course)
+
         reg_courses.courses.add(course)
+        reg_courses.save()
+
+        reg_std.students.add(student)
+        reg_std.save()
 
         # return data back to the page
         return JsonResponse({'course_code': course_code})
 
 
 # Create function to remove course to registered courses
-@method_decorator(login_required())
 def remove_course(request):
     if request.method == "POST":
         course_code = request.POST.get("course_code")
@@ -404,7 +411,18 @@ def remove_course(request):
         else:
             reg_courses = RegisteredCourses(student=student)
 
+        if RegisteredStudent.objects.filter(course=course).exists():
+            # Get all the courses registered for by a student
+            reg_std = RegisteredStudent.objects.get(course=course)
+        else:
+            # Create object
+            reg_std = RegisteredStudent.objects.create(course=course)
+
         reg_courses.courses.remove(course)
+        reg_courses.save()
+
+        reg_std.students.remove(student)
+        reg_std.save()
 
         # return data back to the page
         return JsonResponse({'course_code': course_code})
@@ -501,22 +519,36 @@ class AttendanceRegisterView(View):
             user_date = datetime.date(int(user_date[0]), int(user_date[1]), int(user_date[2]))
 
             # use a try block
-            try:
+            if CourseAttendance.objects.filter(**{'course':course, 'date':user_date}).exists():
                 # Get the required course attendance using the course and converted date
                 course_attendance = get_object_or_404(CourseAttendance, course=course, date=user_date)
                 # Get a list of all the ids of students in the course attendance
                 student_attendance = course_attendance.student_attendance.all().order_by('id')
                 # Create a dictionary of data to be returned to the page
                 context = {
+                    'person': person,
                     'course_attendance': course_attendance,
                     'student_attendance': student_attendance,
                     'courses': courses,
                 }
             # if course attendance does not exist
-            except Exception:
+            else:
+                # Create the required course attendance using the course and converted date
+                course_attendance = CourseAttendance.objects.create(course=course, date=user_date)
+                # Get all the student registered for by a course
+                reg_std = RegisteredStudent.objects.get(course=course)
+                for student in reg_std.students.all():
+                    std_att = StudentAttendance.objects.create(student=student, date=user_date)
+                    std_att.save()
+                    course_attendance.student_attendance.add(std_att)
+                    course_attendance.save()
+                # Get a list of all the ids of students in the course attendance
+                student_attendance = course_attendance.student_attendance.all().order_by('id')
+                # Create a dictionary of data to be returned to the page
                 context = {
                     'person': person,
-                    'student_attendance': {},
+                    'course_attendance': course_attendance,
+                    'student_attendance': student_attendance,
                     'courses': courses,
                 }
             # return data back to the page
@@ -524,7 +556,6 @@ class AttendanceRegisterView(View):
 
 
 # Create function to mark attendance
-@method_decorator(login_required())
 def take_attendance(request):
     if request.method == "POST":
         course_att = request.POST.get("course_att")
@@ -603,7 +634,6 @@ class AttendanceSheetView(View):
             except Exception:
                 context = {
                     'person': person,
-                    'student_attendance': {},
                     'courses': courses,
                 }
             # return data back to the page
