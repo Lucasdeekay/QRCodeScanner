@@ -56,12 +56,14 @@ Mark Attendance
                                         <tr role="row" class="odd">
                                             <td class=""><span>{{ att.student.person.full_name }}</span></td>
                                             <td><span class="text-primary">{{ att.student.matric_no }}</span></td>
-                                            <td id="att_status">
-                                                {% if att.is_present %}
-                                                <span  class="badge badge-success light border-0">Present</span>
-                                                {% else %}
-                                                <span class="badge badge-danger light border-0">Absent</span>
-                                                {% endif %}
+                                            <td id="{{ att.student.matric_no }}">
+                                                <span  class="badge {% if att.is_present %}badge-success{% else %}badge-danger{% endif %} light border-0" id="id_{{ att.student.matric_no }}">
+                                                    {% if att.is_present %}
+                                                    Present
+                                                    {% else %}
+                                                    Absent
+                                                    {% endif %}
+                                                </span>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -119,7 +121,6 @@ Instascan.Camera.getCameras().then(function(cameras) {
 
 scanner.addListener('scan', function(content) {
     $("#video").show();
-    $("#att_status").empty();
     $.ajax({
         type: 'POST',
         url: "{% url 'Scanner:take_attendance' %}",
@@ -129,8 +130,9 @@ scanner.addListener('scan', function(content) {
             csrfmiddlewaretoken: $("input[name=csrfmiddlewaretoken]").val()
         },
         success: function(data){
-            temp = `<span class="badge badge-success light border-0">Present</span>`;
-            $("#att_status").append(temp);
+            $("#"+data.matric_no).empty();
+            temp = `<span class="badge badge-success light border-0" id="id_${data.matric_no}">Present</span>`;
+            $("#"+data.matric_no).append(temp);
         },
     });
 });

@@ -571,7 +571,7 @@ def take_attendance(request):
         std_att.save()
 
         # return data back to the page
-        return JsonResponse({'att_id': std_att.id})
+        return JsonResponse({'att_id': std_att.id, 'matric_no': matric_no})
 
 
 # Create an attendance sheet view
