@@ -2,7 +2,8 @@ from django.urls import path
 
 from . import views
 from .views import DashboardView, AttendanceRegisterView, AttendanceSheetView, LoginView, LogoutView, \
-    RegisterCoursesView, RegisteredCoursesView, RegisterView, ForgotPasswordView, UpdatePasswordView, CreateCourseView
+    RegisterCoursesView, RegisteredCoursesView, RegisterView, ForgotPasswordView, UpdatePasswordView, CreateCourseView, \
+    StatisticsView
 
 app_name = 'Scanner'
 
@@ -21,4 +22,5 @@ urlpatterns = [
     path('attendance', AttendanceRegisterView.as_view(), name="attendance_register"),
     path('attendance/take_attendance', views.take_attendance, name="take_attendance"),
     path('attendance/view', AttendanceSheetView.as_view(), name="attendance_sheet"),
+    path('attendance/statistics', StatisticsView.as_view(), name="statistics"),
 ]

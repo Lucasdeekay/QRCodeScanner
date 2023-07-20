@@ -1,0 +1,71 @@
+{% extends 'main.html' %}
+
+{% load static %}
+
+{% block title %}
+Attendance Statistics
+{% endblock title %}
+
+{% block header %}
+Attendance Statistics
+{% endblock header %}
+
+
+{% block content %}
+<div class="col-xl-12">
+    <div class="card">
+        <div class="card-body p-0">
+            <div class="table-responsive active-projects style-1">
+                <table id="empoloyees-tblwrapper" class="table">
+                    <thead>
+                        <tr role="row">
+                            <th class="" style="width: 90px;">
+                                Course Code
+                            </th>
+                            <th class="" style="width: 30px;">
+                                No Of Times Present
+                            </th>
+                            <th class="" style="width: 30px;">
+                                No Of Times Absent
+                            </th>
+                          <th class="" style="width: 30px;">
+                                Attendance (%)
+                            </th>
+                          <th class="" style="width: 30px;">
+                                Status
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for code, present, absent, percent in zipped %}
+                        <tr role="row" class="odd">
+                            <td class=""><span>{{ code }}</span></td>
+                            <td><span class="text-primary">{{ present }}</span></td>
+                            <td><span class="text-primary">{{ absent }}</span></td>
+                            <td>
+                                {% if percent >= 75 %}
+                                <span class="badge badge-success light border-0">{{ percent }}</span>
+                                {% else %}
+                                <span class="badge badge-danger light border-0">{{ percent }}</span>
+                                {% endif %}
+                            </td>
+                          <td>
+                                {% if percent >= 75 %}
+                                <span class="badge badge-success light border-0">Eligible</span>
+                                {% else %}
+                                <span class="badge badge-danger light border-0">Not Eligible</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr role="row" class="odd">
+                            <td><span>No attendance available</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
