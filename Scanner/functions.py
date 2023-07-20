@@ -1,11 +1,9 @@
 # function returns the total amount of times a student is present for a course
-from Scanner.models import CourseAttendance, RegisteredStudent
-
-session = '2022/2023'
+from Scanner.models import CourseAttendance
 
 
 def get_number_of_course_attendance_present(course, student):
-    all_attendance = CourseAttendance.objects.filter(course=course, session=session)
+    all_attendance = CourseAttendance.objects.filter(course=course)
     present = 0
     for att in all_attendance:
         try:
@@ -19,7 +17,7 @@ def get_number_of_course_attendance_present(course, student):
 
 # function returns the total amount of times a student is absent for a course
 def get_number_of_course_attendance_absent(course, student):
-    all_attendance = CourseAttendance.objects.filter(course=course, session=session)
+    all_attendance = CourseAttendance.objects.filter(course=course)
     absent = 0
     for att in all_attendance:
         try:
@@ -33,7 +31,7 @@ def get_number_of_course_attendance_absent(course, student):
 
 # function returns the percentage a student is present for a course
 def get_number_of_course_attendance_percentage(course, student):
-    all_attendance = CourseAttendance.objects.filter(course=course, session=session)
+    all_attendance = CourseAttendance.objects.filter(course=course)
     present = 0
     absent = 0
     for att in all_attendance:
