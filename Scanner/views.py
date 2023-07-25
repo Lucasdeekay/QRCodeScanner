@@ -569,7 +569,7 @@ def take_attendance(request):
         course_attendance = get_object_or_404(CourseAttendance, id=course_att)
         # Get student
         student = get_object_or_404(Student, matric_no=matric_no)
-        std_att = course_attendance.student_attendance.filter(student=student)
+        std_att = course_attendance.student_attendance.get(student=student)
         # Cancel attendance
         std_att.is_present = True
         std_att.save()

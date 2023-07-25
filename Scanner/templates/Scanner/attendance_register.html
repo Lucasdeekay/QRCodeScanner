@@ -111,6 +111,7 @@ let scanner = new Instascan.Scanner({
 Instascan.Camera.getCameras().then(function(cameras) {
 
   if (cameras.length > 0) {
+    $("#video").show();
     scanner.start(cameras[0]);
   } else {
     alert('No cameras found.');
@@ -120,7 +121,6 @@ Instascan.Camera.getCameras().then(function(cameras) {
 });
 
 scanner.addListener('scan', function(content) {
-    $("#video").show();
     $.ajax({
         type: 'POST',
         url: "{% url 'Scanner:take_attendance' %}",
