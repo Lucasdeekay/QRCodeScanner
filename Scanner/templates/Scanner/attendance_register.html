@@ -20,6 +20,7 @@ Mark Attendance
                     <div class="table-responsive active-projects style-1">
                         <div class="tbl-caption">
                             <h4 class="heading mb-0">Students</h4>
+                            {% if not student_attendance %}
                             <form method="post" action="" style="display: inline-flex;">
                                 {% csrf_token %}
                                 <select class="form-control" name="course_code">
@@ -33,6 +34,7 @@ Mark Attendance
                                     Submit
                                 </button>
                             </form>
+                            {% endif %}
                         </div>
                         <div id="empoloyees-tbl_wrapper" class="dataTables_wrapper no-footer" style="overflow-y:auto">
                             <table id="empoloyees-tbl" class="table dataTable no-footer" role="grid"
@@ -51,27 +53,25 @@ Mark Attendance
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {% if student_attendance %}
                                     {% for att in student_attendance %}
-                                        <tr role="row" class="odd">
-                                            <td class=""><span>{{ att.student.person.full_name }}</span></td>
-                                            <td><span class="text-primary">{{ att.student.matric_no }}</span></td>
-                                            <td id="{{ att.student.matric_no }}">
-                                                <span  class="badge {% if att.is_present %}badge-success{% else %}badge-danger{% endif %} light border-0" id="id_{{ att.student.matric_no }}">
-                                                    {% if att.is_present %}
-                                                    Present
-                                                    {% else %}
-                                                    Absent
-                                                    {% endif %}
-                                                </span>
-                                            </td>
-                                        </tr>
-                                    {% endfor %}
-                                {% else %}
+                                    <tr role="row" class="odd">
+                                        <td class=""><span>{{ att.student.person.full_name }}</span></td>
+                                        <td><span class="text-primary">{{ att.student.matric_no }}</span></td>
+                                        <td id="{{ att.student.matric_no }}">
+                                            <span  class="badge {% if att.is_present %}badge-success{% else %}badge-danger{% endif %} light border-0" id="id_{{ att.student.matric_no }}">
+                                                {% if att.is_present %}
+                                                Present
+                                                {% else %}
+                                                Absent
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
                                     <tr role="row" class="odd">
                                         <td><span>No attendance available</span></td>
                                     </tr>
-                                {% endif %}
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>

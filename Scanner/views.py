@@ -101,7 +101,7 @@ class ForgotPasswordView(View):
                 messages.success(request, "Recovery password has been successfully sent")
 
                 # Redirect back to dashboard if true
-                return HttpResponseRedirect(reverse('Scanner:password_retrieval', args=(user.id,)))
+                return HttpResponseRedirect(reverse('Scanner:update_password', args=(user.id,)))
 
             else:
                 messages.success(request, "Password does not match")
