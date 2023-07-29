@@ -15,7 +15,7 @@ from django.views import View
 
 from .forms import LoginForm, UpdatePasswordForm, RegisterForm, ForgotPasswordForm, CourseForm
 from .functions import get_number_of_course_attendance_percentage, get_number_of_course_attendance_present, \
-    get_number_of_course_attendance_absent
+    get_number_of_course_attendance_absent, get_total_number_of_students
 from .models import Staff, Course, CourseAttendance, Student, Person, RegisteredCourses, Department, Programme, \
     RegisteredStudent, StudentAttendance
 
@@ -653,51 +653,75 @@ class StatisticsView(View):
         # Get the current person logged in
         person = get_object_or_404(Person, user=request.user)
 
-        # Get the current logged in student
-        student = get_object_or_404(Student, person=person)
+        # Check if user is a staff
+        if Staff.objects.filter(person=person):
+            # Get the current logged in staff
+            staff = get_object_or_404(Staff, person=person)
+            #  Filter all the courses in staff department
+            courses = Course.objects.filter(lecturer=staff)
 
-        if RegisteredStudent.objects.filter(session=session).exists():
-            # Get all the registered courses by the student
-            reg_students = RegisteredStudent.objects.filter(session=session)
+            # Get all the course codes
+            course_codes = list(map(lambda x: x.course_code, courses))
+            # Get the total number of students for each course
+            course_total_students = list(map(lambda x: get_total_number_of_students(x), courses))
 
-            courses = [
-                reg_std.course for reg_std in reg_students if student in reg_std.students.all()
-            ]
-            course_codes = [
-                reg_std.course.course_code for reg_std in reg_students if student in reg_std.students.all()
-            ]
-            course_attendance_present = [
-                get_number_of_course_attendance_present(reg_std.course, student) for reg_std in reg_students if
-                student in reg_std.students.all()
-            ]
-            course_attendance_absent = [
-                get_number_of_course_attendance_absent(reg_std.course, student) for reg_std in reg_students if
-                student in reg_std.students.all()
-            ]
-            course_attendance_percentage = [
-                get_number_of_course_attendance_percentage(reg_std.course, student) for reg_std in reg_students if
-                student in reg_std.students.all()
-            ]
-            no_of_eligible_courses = []
-            no_of_ineligible_courses = []
-            for percentage in course_attendance_percentage:
-                if percentage >= 75:
-                    no_of_eligible_courses.append(percentage)
-                else:
-                    no_of_ineligible_courses.append(percentage)
-
-            zipped = zip(course_codes, course_attendance_present, course_attendance_absent,
-                         course_attendance_percentage)
+            zipped = zip(course_codes, course_total_students)
+            # Create a dictionary of data to be accessed on the page
+            context = {
+                'user': staff,
+                'person': person,
+                'zipped': zipped,
+                'courses': courses,
+            }
+        # Otherwise
         else:
-            courses = {}
-            zipped = []
 
-        # Create a dictionary of data to be accessed on the page
-        context = {
-            'user': student,
-            'zipped': zipped,
-            'courses': courses,
-        }
+            # Get the current logged in student
+            student = get_object_or_404(Student, person=person)
+
+            if RegisteredStudent.objects.filter(session=session).exists():
+                # Get all the registered courses by the student
+                reg_students = RegisteredStudent.objects.filter(session=session)
+
+                courses = [
+                    reg_std.course for reg_std in reg_students if student in reg_std.students.all()
+                ]
+                course_codes = [
+                    reg_std.course.course_code for reg_std in reg_students if student in reg_std.students.all()
+                ]
+                course_attendance_present = [
+                    get_number_of_course_attendance_present(reg_std.course, student) for reg_std in reg_students if
+                    student in reg_std.students.all()
+                ]
+                course_attendance_absent = [
+                    get_number_of_course_attendance_absent(reg_std.course, student) for reg_std in reg_students if
+                    student in reg_std.students.all()
+                ]
+                course_attendance_percentage = [
+                    get_number_of_course_attendance_percentage(reg_std.course, student) for reg_std in reg_students if
+                    student in reg_std.students.all()
+                ]
+                no_of_eligible_courses = []
+                no_of_ineligible_courses = []
+                for percentage in course_attendance_percentage:
+                    if percentage >= 75:
+                        no_of_eligible_courses.append(percentage)
+                    else:
+                        no_of_ineligible_courses.append(percentage)
+
+                zipped = zip(course_codes, course_attendance_present, course_attendance_absent,
+                             course_attendance_percentage)
+            else:
+                courses = {}
+                zipped = []
+
+            # Create a dictionary of data to be accessed on the page
+            context = {
+                'user': student,
+                'person': person,
+                'zipped': zipped,
+                'courses': courses,
+            }
         # Load te page with the data
         return render(request, self.template_name, context)
 

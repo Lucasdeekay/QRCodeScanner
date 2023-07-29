@@ -16,6 +16,32 @@ Attendance Statistics
     <div class="card">
         <div class="card-body p-0">
             <div class="table-responsive active-projects style-1">
+                {% if person.is_staff %}
+                <table id="empoloyees-tblwrapper" class="table">
+                    <thead>
+                        <tr role="row">
+                            <th class="" style="width: 90px;">
+                                Course Code
+                            </th>
+                            <th class="" style="width: 30px; text-align: center;">
+                                No Of Students
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for code, students in zipped %}
+                        <tr role="row" class="odd">
+                            <td class=""><span>{{ code }}</span></td>
+                            <td style="text-align: center;"><span class="text-primary">{{ students }}</span></td>
+                        </tr>
+                        {% empty %}
+                        <tr role="row" class="odd">
+                            <td><span>No Record available</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
                 <table id="empoloyees-tblwrapper" class="table">
                     <thead>
                         <tr role="row">
@@ -64,6 +90,7 @@ Attendance Statistics
                         {% endfor %}
                     </tbody>
                 </table>
+                {% endif %}
             </div>
         </div>
     </div>

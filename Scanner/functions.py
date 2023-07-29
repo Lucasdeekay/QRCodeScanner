@@ -1,5 +1,16 @@
 # function returns the total amount of times a student is present for a course
-from Scanner.models import CourseAttendance
+from Scanner.models import CourseAttendance, RegisteredStudent
+
+
+session = '2022/2023'
+
+
+def get_total_number_of_students(course):
+    if RegisteredStudent.objects.filter(course=course, session=session).exists():
+        all_students = RegisteredStudent.objects.get(course=course, session=session).students.all()
+        return len(all_students)
+    else:
+        return 0
 
 
 def get_number_of_course_attendance_present(course, student):
