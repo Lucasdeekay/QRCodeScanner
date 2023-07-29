@@ -18,7 +18,7 @@ View Attendance
             <div class="table-responsive active-projects style-1">
                 <div class="tbl-caption">
                     <h4 class="heading mb-0">Students</h4>
-                    {% if student_attendance %}
+                    {% if not student_attendance %}
                     <form method="post" action="" style="display: inline-flex;">
                         {% csrf_token %}
                         <select class="form-control" name="course_code">
